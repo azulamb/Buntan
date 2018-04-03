@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja" style="font-size:20px;">
+<head>
+<meta charset="utf-8">
+<title>Buntan sample</title>
+<script type="text/javascript" src="./app.js"></script>
+<style type="text/css">
+#content{ width: 400px; height: 600px; background-color: lightgray; overflow: hidden; position: relative; margin: auto; }
+#content .msgwin { background: rgba( 0, 0, 0, 0.3 ); height: 200px; overflow: hidden; position: absolute; bottom: 0; width: 100%;}
+#choices { display: none; }
+#choices.open { display: block; }
+.buttons { position: absolute; bottom: 0; }
+</style>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function () {
+	var adv = new Buntan(document.getElementById('content'), {
+		escapement: 100,
+	});
+	adv.addEffect('finish', function (end) {
+		var content = document.getElementById('content');
+		var color = content.style.backgroundColor;
+		content.style.backgroundColor = 'pink';
+		setTimeout(function () {
+			content.style.backgroundColor = color;
+			end();
+		}, 2000);
+	});
+	adv.add([
+		{ name: 'aaa', text: 'もしかして？' },
+		{ name: 'bbb', text: '私たち？' },
+		{ name: '二人', text: '入れ替わってるー！？', choices: [{ name: 'はい', label: 'next' }, { name: 'いいえ', label: 'change' }], label: 'change' },
+		{ name: 'ナレーション', text: '説明しよう！', label: 'next' },
+		{ text: '二人の体は一時的に入れ替わってしまったのだ！' },
+		{ text: '今後の二人の運命やいかに！', choices: [{ name: 'はい', label: 'next2' }, { name: 'いいえ', label: 'next3' }] },
+		{ text: 'はいを選びました。', label: 'next2', jump: 'endif' },
+		{ text: 'いいえを選びました', label: 'next3', jump: 'endif' },
+		{ name: 'システム', text: '自爆システムを稼働します', label: 'endif', effect: 'finish' },
+		{ text: '自爆しました' },
+	]);
+	adv.addEventListener('choices', function (choices) {
+		var area = document.getElementById('choices');
+		area.classList.add('open');
+		var children = area.childNodes;
+		for (var i = children.length - 1; 0 <= i; --i) {
+			area.removeChild(children[i]);
+		}
+		choices.forEach(function (choice, index) {
+			var button = document.createElement('button');
+			button.textContent = choice.name;
+			button.addEventListener('click', function (event) {
+				event.preventDefault();
+				adv.choice(index);
+				area.classList.remove('open');
+			}, false);
+			area.appendChild(button);
+		});
+	});
+	document.getElementById('next').addEventListener('click', function (event) {
+		event.preventDefault();
+		adv.cancelAuto();
+		var choices = adv.next();
+	}, false);
+	document.getElementById('auto').addEventListener('click', function (event) {
+		adv.auto();
+	}, false);
+});
+	</script>
+</head>
+<body>
+	<div id="content">
+		<div class="chara"></div>
+		<div id="choices"></div>
+		<div class="msgwin">
+			<div class="name"></div>
+			<div class="text"></div>
+			<div class="buttons">
+				<button id="next">Next</button>
+				<button id="auto">Auto</button>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
