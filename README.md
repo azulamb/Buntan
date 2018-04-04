@@ -18,6 +18,17 @@
 
 この要素を含む親要素が最低限必要です。
 
+これを持つ親要素を指定するので、最小構成は以下のような感じです。
+
+```
+<div id="content"><!-- Parent node -->
+	<div class="msgwin"><!-- Message window -->
+		<div class="name"> Name </div>
+		<div class="text"> Text </div>
+	</div>
+</div>
+```
+
 詳しくは `docs/index.html` を見てください。
 
 サンプルでは以下のようになります。
@@ -28,7 +39,7 @@ var adv = new Buntan( document.getElementById('content') );
 
 また第二引数ではオプションを指定することもできます。
 
-TODO: オプション
+TODO: オプション説明
 
 ## エフェクトの追加
 
