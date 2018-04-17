@@ -208,5 +208,8 @@ var Buntan = (function () {
         }
         return this.logs.slice(0, this.count + 1);
     };
+    Buntan.prototype.isEnd = function () {
+        return this.logs[this.count] === undefined;
+    };
     return Buntan;
 }());

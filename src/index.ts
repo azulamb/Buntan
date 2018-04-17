@@ -322,4 +322,9 @@ class Buntan
 		return this.logs.slice( 0, this.count + 1 );
 	}
 
+	public isEnd()
+	{
+		return this.logs[ this.count ] === undefined;
+	}
+
 }
