@@ -39,7 +39,6 @@ var adv = new Buntan( document.getElementById('content') );
 
 また第二引数ではオプションを指定することもできます。
 
-<<<<<<< HEAD
 ### オプションについて
 
 
@@ -75,10 +74,6 @@ var adv = new Buntan( document.getElementById('content') );
 * 文字をすべて表示し、待ち時間も消費してもなお `printTime` より短い場合は、この時間を過ぎるまで待つ。
 
 また、わりとこの処理は大雑把なので、精度に関しては期待せず、最低限これだけの時間は確保するという目安に考えてください。
-
-=======
-TODO: オプション説明
->>>>>>> f93c3d933fb89b6a3f2482bf80ee043a69cfc261
 
 ## エフェクトの追加
 
