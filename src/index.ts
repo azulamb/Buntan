@@ -1,15 +1,13 @@
 interface CHOICE_DATA
 {
 	name: string,
-	label: string ,
+	label: string,
 }
 
 interface BUNTAN_DATA
 {
 	text: string,
 	name?: string,
-	img?: string,
-	back?: string,
 	label?: string,
 	jump?: string,
 	effect?: string,
@@ -19,6 +17,8 @@ interface BUNTAN_DATA
 interface BUNTAN_CONFIG
 {
 	escapement?: number,
+	afterWait?: number,
+	printTime?: number,
 }
 
 interface BUNTAN_EVENT
@@ -67,6 +67,8 @@ class Buntan
 
 		// 制御設定の初期化
 		if ( this.config.escapement && this.config.escapement < 0 ) { this.config.escapement = 0; }
+		if ( this.config.afterWait && this.config.afterWait < 0 ) { this.config.afterWait = 1000; }
+		if ( this.config.printTime && this.config.printTime < 0 ) { this.config.afterWait = 0; }
 
 		// 必要な要素の取得
 		this.chara = <HTMLElement>target.getElementsByClassName( 'chara' )[ 0 ];
@@ -128,8 +130,6 @@ class Buntan
 	        {
 	            text:   会話文[必須]
 	            name:   表示する名前[任意,省略時には過去のを引き継ぐ]
-	            img:    表示するキャラの画像パス[任意]
-	            back:   表示する背景の画像パス[任意]
 	            label:  設定すると選択肢で飛ぶことができるラベル[任意]
 	            jump:   設定するとテキスト再生後に指定したラベルに飛ぶ[任意]
 	            effect: 設定するとテキスト再生後に指定したエフェクトを再生する[任意]
@@ -267,6 +267,7 @@ class Buntan
 	{
 		if ( this.count < 0 || !this.logs[ this.count ] || !this.logs[ this.count ].choices ) { return this.next(); }
 		const choices = <CHOICE_DATA[]>this.logs[ this.count ].choices;
+		if ( !choices ) { return this.next(); }
 		if ( choices.length <= 1 )
 		{
 			return this.next( choices[ 0 ].label );
@@ -279,12 +280,19 @@ class Buntan
 	{
 		if ( this.autoInterval ) { return; }
 
-		let count = 10;
+		let begin = new Date().getTime();
+		let end = 0;
+		const afterWait = this.config.afterWait || 0;
+		const printTime = this.config.printTime || 0;
 		this.autoInterval = setInterval( () =>
 		{
 			if ( this.anime ) { return; }
-			if ( 0 < --count ) { return; }
-			count = 10;
+			const now = new Date().getTime();
+			if ( end <= 0 ) { end = begin; }
+			if ( now - end < afterWait ) { return; }
+			if ( now - begin < printTime ) { return; }
+			end = 0;
+			begin = now;
 			this.next();
 		}, this.config.escapement || 100 );
 	}
@@ -307,68 +315,11 @@ class Buntan
 		}
 	}*/
 
-	public getLogs(){}
+	public getLogs( all: boolean = false )
+	{
+		if ( all || this.logs.length + 1 <= this.count) { return this.logs; }
+		if ( this.count < 0 ) { return []; }
+		return this.logs.slice( 0, this.count + 1 );
+	}
 
 }
-
-/*document.addEventListener( 'DOMContentLoaded', () =>
-{
-	const adv = new Buntan( <HTMLElement>document.getElementById( 'content' ),
-	{
-		escapement: 100,
-	} );
-	adv.addEffect( 'finish', ( end ) => {
-		const content = <HTMLElement>document.getElementById( 'content' );
-		const color = content.style.backgroundColor;
-		content.style.backgroundColor = 'pink';
-		setTimeout( () =>
-		{
-			content.style.backgroundColor = color;
-			end();
-		}, 2000 );
-	} );
-	adv.add(
-	[
-		{ name: 'aaa', text: 'もしかして？' },
-		{ name: 'bbb', text: '私たち？' },
-		{ name: '二人', text: '入れ替わってるー！？', choices: [ { name: 'はい', label: 'next' }, { name: 'いいえ', label: 'change' } ], label: 'change' },
-		{ name: 'ナレーション', text: '説明しよう！', label: 'next' },
-		{ text: '二人の体は一時的に入れ替わってしまったのだ！' },
-		{ text: '今後の二人の運命やいかに！', choices: [ { name: 'はい', label: 'next2' }, { name: 'いいえ', label: 'next3' } ] },
-		{ text: 'はいを選びました。', label: 'next2', jump: 'endif' },
-		{ text: 'いいえを選びました', label: 'next3', jump: 'endif' },
-		{ name: 'システム', text: '自爆システムを稼働します', label: 'endif', effect: 'finish' },
-		{ text: '自爆しました' },
-	] );
-
-	adv.addEventListener( 'choices', ( choices ) =>
-	{
-		const area = <HTMLElement>document.getElementById( 'choices' );
-		area.classList.add( 'open' );
-		const children = area.childNodes;
-		for ( let i = children.length - 1 ; 0 <= i ; --i ) { area.removeChild( children[ i ] ); }
-		choices.forEach( ( choice, index ) =>
-		{
-			const button = document.createElement( 'button' );
-			button.textContent = choice.name;
-			button.addEventListener( 'click', ( event ) =>
-			{
-				event.preventDefault();
-				adv.choice( index );
-				area.classList.remove( 'open' );
-			}, false );
-			area.appendChild( button );
-		} );
-	} );
-
-	(<HTMLElement>document.getElementById( 'next' )).addEventListener( 'click', ( event ) =>
-	{
-		event.preventDefault();
-		adv.cancelAuto();
-		const choices = adv.next();
-	}, false );
-	(<HTMLElement>document.getElementById( 'auto' )).addEventListener( 'click', ( event ) =>
-	{
-		adv.auto();
-	}, false );
-} );*/

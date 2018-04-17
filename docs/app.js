@@ -12,6 +12,12 @@ var Buntan = (function () {
         if (this.config.escapement && this.config.escapement < 0) {
             this.config.escapement = 0;
         }
+        if (this.config.afterWait && this.config.afterWait < 0) {
+            this.config.afterWait = 1000;
+        }
+        if (this.config.printTime && this.config.printTime < 0) {
+            this.config.afterWait = 0;
+        }
         this.chara = target.getElementsByClassName('chara')[0];
         var win = target.getElementsByClassName('msgwin')[0];
         this.name = win.getElementsByClassName('name')[0];
@@ -150,6 +156,9 @@ var Buntan = (function () {
             return this.next();
         }
         var choices = this.logs[this.count].choices;
+        if (!choices) {
+            return this.next();
+        }
         if (choices.length <= 1) {
             return this.next(choices[0].label);
         }
@@ -160,15 +169,26 @@ var Buntan = (function () {
         if (this.autoInterval) {
             return;
         }
-        var count = 10;
+        var begin = new Date().getTime();
+        var end = 0;
+        var afterWait = this.config.afterWait || 0;
+        var printTime = this.config.printTime || 0;
         this.autoInterval = setInterval(function () {
             if (_this.anime) {
                 return;
             }
-            if (0 < --count) {
+            var now = new Date().getTime();
+            if (end <= 0) {
+                end = begin;
+            }
+            if (now - end < afterWait) {
                 return;
             }
-            count = 10;
+            if (now - begin < printTime) {
+                return;
+            }
+            end = 0;
+            begin = now;
             _this.next();
         }, this.config.escapement || 100);
     };
@@ -178,6 +198,15 @@ var Buntan = (function () {
         }
         this.autoInterval = 0;
     };
-    Buntan.prototype.getLogs = function () { };
+    Buntan.prototype.getLogs = function (all) {
+        if (all === void 0) { all = false; }
+        if (all || this.logs.length + 1 <= this.count) {
+            return this.logs;
+        }
+        if (this.count < 0) {
+            return [];
+        }
+        return this.logs.slice(0, this.count + 1);
+    };
     return Buntan;
 }());
