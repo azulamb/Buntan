@@ -280,6 +280,8 @@ class Buntan
 	{
 		if ( this.autoInterval ) { return; }
 
+		if ( this.count < 0 ) { this.next(); }
+
 		let begin = new Date().getTime();
 		let end = 0;
 		const afterWait = this.config.afterWait || 0;

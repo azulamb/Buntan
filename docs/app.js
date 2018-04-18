@@ -169,6 +169,9 @@ var Buntan = (function () {
         if (this.autoInterval) {
             return;
         }
+        if (this.count < 0) {
+            this.next();
+        }
         var begin = new Date().getTime();
         var end = 0;
         var afterWait = this.config.afterWait || 0;
