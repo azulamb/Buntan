@@ -209,7 +209,7 @@ var Buntan = (function () {
         return this.logs.slice(0, this.count + 1);
     };
     Buntan.prototype.isEnd = function () {
-        return this.logs[this.count] === undefined;
+        return (0 < this.count || this.logs.length <= this.count) && this.logs[this.count] === undefined;
     };
     return Buntan;
 }());

@@ -324,7 +324,7 @@ class Buntan
 
 	public isEnd()
 	{
-		return this.logs[ this.count ] === undefined;
+		return ( 0 < this.count || this.logs.length <= this.count ) && this.logs[ this.count ] === undefined;
 	}
 
 }
